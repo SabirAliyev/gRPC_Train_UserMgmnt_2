@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package usermgmt;
+
+option go_package = "example.com/go-usermgmt-grcp;go_usermgmt_grcp";
+
+service UserManagement {
+    rpc CreateNewUser (NewUser) returns (User) {}
+
+    // 1. We add new method with empty message GetUsersParams in input. 
+    // The reason of using an empty message is because in initial implementation of this method we simply want to return
+    // a list of all users. But in future iterations we may want to pass parameters to GetUsers() service method. For
+    // instance we may want to pass a regular expression that returns all of subset of users, that match the pattern of
+    // the regular expression. So to keep the API backwards compatible we`re going to pass an empty message as the input.
+    rpc GetUsers (GetUsersParams) returns (UserList) {}
+}
+
+message NewUser {
+    string name = 1;
+    int32 age = 2;
+}
+
+message User {
+    string name = 1;
+    int32 age = 2;
+    int32 id = 3;
+}
+
+message GetUsersParams {
+
+}
+
+message UserList {
+    repeated User users = 1;
+
+    // 2. The `repeated` keyword that we use in order to return a list of something inside the proto message.
+    // Here we return a User message type.
+
+    // 3. After creation this message we save the file and rerun our protoc compiler command from the project directory:
+    // protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative usermgmt/usermgmt.proto
+}
